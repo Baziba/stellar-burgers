@@ -132,6 +132,7 @@ export const updateUser = createAsyncThunk(
 export const checkUserAuthentication = createAsyncThunk(
   'user/checkAuthentication',
   async () => {
+    console.log('user/checkAuthentication');
     const accessToken = getCookie('accessToken');
 
     if (!accessToken) {

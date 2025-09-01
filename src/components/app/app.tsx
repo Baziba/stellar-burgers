@@ -14,7 +14,7 @@ import styles from './app.module.css';
 
 import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
 import { useDispatch } from '../../services/store';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { getIngredients } from '../../services/slices/ingredients/ingredientsSlice';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { ProtectedRoute } from '../protected-route';
@@ -32,8 +32,8 @@ const App = () => {
   };
 
   useEffect(() => {
-    dispatch(checkUserAuthentication());
     dispatch(getIngredients());
+    dispatch(checkUserAuthentication());
   }, [dispatch]);
 
   return (
