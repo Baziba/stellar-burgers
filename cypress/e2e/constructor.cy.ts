@@ -152,7 +152,7 @@ describe('Тестирование конструктора бургеров', (
         'contain',
         'Выберите начинку'
       );
-пшке
+
       /* Закрываем модалку с заказом */
       cy.get(selectors.modalCloseButton).click();
       cy.get(selectors.orderDetails).should('not.exist');
