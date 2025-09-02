@@ -1,6 +1,6 @@
 import { TOrder } from '@utils-types';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getOrderByNumberApi, getOrdersApi, orderBurgerApi } from '@api';
+import { getOrderByNumberApi, getOrdersApi } from '@api';
 
 export type TOrderState = {
   error: string | null;
@@ -10,7 +10,7 @@ export type TOrderState = {
   userOrders: TOrder[];
 };
 
-const initialState: TOrderState = {
+export const initialState: TOrderState = {
   error: null,
   isLoading: false,
   orderModalData: null,
@@ -39,7 +39,7 @@ export const orderSlice = createSlice({
       })
       .addCase(getOrder.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || null;
+        state.error = action.error?.message || null;
         state.orderModalData = null;
       });
     builder

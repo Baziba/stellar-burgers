@@ -19,7 +19,7 @@ type TUserState = {
   user: TUser | null;
 };
 
-const initialState: TUserState = {
+export const initialState: TUserState = {
   error: null,
   isAuthChecked: false,
   isLoading: false,
@@ -132,7 +132,6 @@ export const updateUser = createAsyncThunk(
 export const checkUserAuthentication = createAsyncThunk(
   'user/checkAuthentication',
   async () => {
-    console.log('user/checkAuthentication');
     const accessToken = getCookie('accessToken');
 
     if (!accessToken) {
