@@ -1,5 +1,6 @@
 import { feedSlice, initialState, getFeeds } from './feedSlice';
-import { configureStore } from '@reduxjs/toolkit';
+
+jest.mock('@api');
 
 describe('feedReducer', () => {
   const ordersMock = [
@@ -44,15 +45,22 @@ describe('feedReducer', () => {
     }
   ];
 
+  const feedResponseMock = {
+    success: true,
+    orders: ordersMock,
+    total: 8888,
+    totalToday: 77
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('getFeeds->Request', async () => {
-    const store = configureStore(feedSlice);
-    global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-    store.dispatch(getFeeds());
-    const testState = store.getState();
+    const testState = feedSlice.reducer(
+      initialState,
+      getFeeds.pending('', undefined)
+    );
 
     expect(testState).toEqual({
       ...initialState,
@@ -63,41 +71,24 @@ describe('feedReducer', () => {
   });
 
   it('getFeeds->Success', async () => {
-    const store = configureStore(feedSlice);
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            success: true,
-            orders: ordersMock
-          })
-      })
-    ) as jest.Mock;
-
-    await store.dispatch(getFeeds());
-    const testState = store.getState();
+    const testState = feedSlice.reducer(
+      initialState,
+      getFeeds.fulfilled(feedResponseMock, '', undefined)
+    );
 
     expect(testState).toEqual({
-      orders: {
-        success: true,
-        orders: ordersMock
-      },
+      orders: feedResponseMock,
       isLoading: false,
       error: undefined
     });
   });
 
   it('getFeeds->Failed', async () => {
-    const store = configureStore(feedSlice);
-    global.fetch = jest.fn(() =>
-      Promise.reject(new Error(errorMessage))
-    ) as jest.Mock;
-
     const errorMessage = 'Ошибка при загрузке ленты заказов';
-
-    await store.dispatch(getFeeds());
-    const testState = store.getState();
+    const testState = feedSlice.reducer(
+      initialState,
+      getFeeds.rejected(new Error(errorMessage), '', undefined)
+    );
 
     expect(testState).toEqual({
       ...initialState,

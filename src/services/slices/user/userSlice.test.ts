@@ -1,4 +1,5 @@
 import {
+  checkUserAuthentication,
   initialState,
   loginUser,
   logoutUser,
@@ -7,20 +8,22 @@ import {
   userSlice
 } from './userSlice';
 import { describe } from '@jest/globals';
-import { configureStore } from '@reduxjs/toolkit';
+import { TLoginData } from '@api';
+import {
+  userDataMock,
+  userLoginDataMock,
+  userRegistrationDataMock
+} from '../../../utils/constants';
+
+jest.mock('@api');
 
 describe('userReducer', () => {
   describe('updateUser', () => {
-    const userUpdateDataMock = {
-      name: 'Updated User',
-      email: 'updated@example.com'
-    };
-
     it('Request', () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-      store.dispatch(updateUser(userUpdateDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        updateUser.pending('', {})
+      );
 
       expect(testState).toEqual({
         isLoading: true,
@@ -31,40 +34,26 @@ describe('userReducer', () => {
     });
 
     it('Success', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              success: true,
-              user: userUpdateDataMock
-            })
-        })
-      ) as jest.Mock;
-
-      await store.dispatch(updateUser(userUpdateDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        updateUser.fulfilled(userDataMock, '', {})
+      );
 
       expect(testState).toEqual({
         ...initialState,
         isLoading: false,
         error: null,
         isAuthChecked: true,
-        user: userUpdateDataMock
+        user: userDataMock
       });
     });
 
     it('Failed', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.reject(new Error(errorMessage))
-      ) as jest.Mock;
-
       const errorMessage = 'Ошибка при обновлении пользователя';
-
-      await store.dispatch(updateUser(userUpdateDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        updateUser.rejected(new Error(errorMessage), '', {})
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -77,19 +66,11 @@ describe('userReducer', () => {
   });
 
   describe('registerUser', () => {
-    /* Мок для регистрации пользователя */
-    const userRegistrationDataMock = {
-      email: 'tester01@test.test',
-      password: 'test333',
-      name: 'Test 01 001'
-    };
-
     it('Request', () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-      store.dispatch(registerUser(userRegistrationDataMock));
-      const testState = store.getState();
-
+      const testState = userSlice.reducer(
+        initialState,
+        registerUser.pending('', userRegistrationDataMock)
+      );
       expect(testState).toEqual({
         isLoading: true,
         isAuthChecked: false,
@@ -99,40 +80,30 @@ describe('userReducer', () => {
     });
 
     it('Success', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              success: true,
-              user: userRegistrationDataMock
-            })
-        })
-      ) as jest.Mock;
-
-      await store.dispatch(registerUser(userRegistrationDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        registerUser.fulfilled(userDataMock, '', userRegistrationDataMock)
+      );
 
       expect(testState).toEqual({
         ...initialState,
         isLoading: false,
         error: null,
         isAuthChecked: true,
-        user: userRegistrationDataMock
+        user: userDataMock
       });
     });
 
     it('Failed', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.reject(new Error(errorMessage))
-      ) as jest.Mock;
-
       const errorMessage = 'Ошибка регистрации нового пользователя';
-
-      await store.dispatch(registerUser(userRegistrationDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        registerUser.rejected(
+          new Error(errorMessage),
+          '',
+          userRegistrationDataMock
+        )
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -145,16 +116,11 @@ describe('userReducer', () => {
   });
 
   describe('loginUser', () => {
-    const userLoginDataMock = {
-      email: 'tester01@test.test',
-      password: 'test333'
-    };
-
     it('Request', () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-      store.dispatch(loginUser(userLoginDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        loginUser.pending('', userLoginDataMock)
+      );
 
       expect(testState).toEqual({
         isLoading: true,
@@ -165,40 +131,26 @@ describe('userReducer', () => {
     });
 
     it('Success', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              success: true,
-              user: userLoginDataMock
-            })
-        })
-      ) as jest.Mock;
-
-      await store.dispatch(loginUser(userLoginDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        loginUser.fulfilled(userDataMock, '', userLoginDataMock)
+      );
 
       expect(testState).toEqual({
         ...initialState,
         isLoading: false,
         error: null,
         isAuthChecked: true,
-        user: userLoginDataMock
+        user: userDataMock
       });
     });
 
     it('Failed', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.reject(new Error(errorMessage))
-      ) as jest.Mock;
-
       const errorMessage = 'Ошибка аутентификации пользователя';
-
-      await store.dispatch(loginUser(userLoginDataMock));
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        loginUser.rejected(new Error(errorMessage), '', userLoginDataMock)
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -212,11 +164,7 @@ describe('userReducer', () => {
 
   describe('logoutUser', () => {
     it('Request', () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-      store.dispatch(logoutUser());
-      const testState = store.getState();
-
+      const testState = userSlice.reducer(initialState, logoutUser.pending(''));
       expect(testState).toEqual({
         isLoading: true,
         isAuthChecked: false,
@@ -226,20 +174,10 @@ describe('userReducer', () => {
     });
 
     it('Success', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              success: true,
-              message: 'Successful logout'
-            })
-        })
-      ) as jest.Mock;
-
-      await store.dispatch(logoutUser());
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        logoutUser.fulfilled({ success: true }, '')
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -251,15 +189,11 @@ describe('userReducer', () => {
     });
 
     it('Failed', async () => {
-      const store = configureStore(userSlice);
-      global.fetch = jest.fn(() =>
-        Promise.reject(new Error(errorMessage))
-      ) as jest.Mock;
-
       const errorMessage = 'Ошибка выхода';
-
-      await store.dispatch(logoutUser());
-      const testState = store.getState();
+      const testState = userSlice.reducer(
+        initialState,
+        logoutUser.rejected(new Error(errorMessage), '')
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -267,6 +201,49 @@ describe('userReducer', () => {
         error: errorMessage,
         user: null,
         isAuthChecked: false
+      });
+    });
+  });
+
+  describe('checkUserAuthentication', () => {
+    test('Request', () => {
+      const testState = userSlice.reducer(
+        initialState,
+        checkUserAuthentication.pending('')
+      );
+
+      expect(testState).toEqual({
+        ...initialState,
+        isLoading: true
+      });
+    });
+
+    test('Success', () => {
+      const testState = userSlice.reducer(
+        initialState,
+        checkUserAuthentication.fulfilled(userDataMock, '')
+      );
+
+      expect(testState).toEqual({
+        ...initialState,
+        isLoading: false,
+        isAuthChecked: true,
+        user: userDataMock
+      });
+    });
+
+    test('Failed', () => {
+      const errorMessage = 'Ошибка проверки пользователя';
+      const testState = userSlice.reducer(
+        initialState,
+        checkUserAuthentication.rejected(new Error(errorMessage), '')
+      );
+
+      expect(testState).toEqual({
+        ...initialState,
+        isLoading: false,
+        isAuthChecked: true,
+        error: errorMessage
       });
     });
   });
