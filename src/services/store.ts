@@ -12,7 +12,7 @@ import userReducer from './slices/user/userSlice';
 import orderReducer from './slices/order/orderSlice';
 import feedReducer from './slices/feed/feedSlice';
 
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   ingredients: ingredientsReducer,
   burgerConstructor: constructorReducer,
   user: userReducer,
@@ -25,11 +25,8 @@ const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production'
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
-
 export type AppDispatch = typeof store.dispatch;
-
+export type RootState = ReturnType<typeof rootReducer>;
 export const useDispatch: () => AppDispatch = () => dispatchHook();
 export const useSelector: TypedUseSelectorHook<RootState> = selectorHook;
-
 export default store;

@@ -7,25 +7,6 @@ import {
 } from '@reduxjs/toolkit';
 
 import { orderBurgerApi } from '@api';
-
-// type TConstructorState = {
-// //   constructorItems: {
-// //     bun: TConstructorIngredient | null;
-// //     ingredients: TConstructorIngredient[];
-// //   };
-// //   order: TOrder | null;
-// //   orderRequest: boolean;
-// // };
-// //
-// // const initialState: TConstructorState = {
-// //   constructorItems: {
-// //     bun: null,
-// //     ingredients: []
-// //   },
-// //   order: null,
-// //   orderRequest: false
-// // };
-
 type TConstructorState = {
   bun: TConstructorIngredient | null;
   ingredients: TConstructorIngredient[];
@@ -33,7 +14,7 @@ type TConstructorState = {
   order: TOrder | null;
 };
 
-const initialState: TConstructorState = {
+export const initialState: TConstructorState = {
   bun: null,
   ingredients: [],
   orderRequest: false,
