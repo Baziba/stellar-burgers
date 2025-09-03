@@ -5,7 +5,8 @@ import {
   getUserOrders
 } from './orderSlice';
 import { TOrder } from '@utils-types';
-import { configureStore } from '@reduxjs/toolkit';
+
+jest.mock('@api');
 
 describe('orderReducer', () => {
   beforeEach(() => {
@@ -29,11 +30,16 @@ describe('orderReducer', () => {
       number: 87612
     };
 
+    const orderResponseMock = {
+      orders: [orderMock],
+      success: true
+    };
+
     it('Request', () => {
-      const store = configureStore(orderSlice);
-      global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-      store.dispatch(getOrder(87612));
-      const testState = store.getState();
+      const testState = orderSlice.reducer(
+        initialState,
+        getOrder.pending('', 0)
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -42,11 +48,9 @@ describe('orderReducer', () => {
     });
 
     it('Success', () => {
-      const response = { orders: [orderMock], success: true };
-      const action = getOrder.fulfilled(response, '', 87612);
       const testState = orderSlice.reducer(
-        { ...initialState, isLoading: true },
-        action
+        initialState,
+        getOrder.fulfilled(orderResponseMock, '', 87612)
       );
 
       expect(testState).toEqual({
@@ -58,15 +62,11 @@ describe('orderReducer', () => {
     });
 
     it('Failed', async () => {
-      const store = configureStore(orderSlice);
-      global.fetch = jest.fn(() =>
-        Promise.reject(new Error(errorMessage))
-      ) as jest.Mock;
-
       const errorMessage = 'Ошибка при загрузке данных заказа';
-
-      await store.dispatch(getOrder(87612));
-      const testState = store.getState();
+      const testState = orderSlice.reducer(
+        initialState,
+        getOrder.rejected(new Error(errorMessage), '', 87612)
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -132,10 +132,10 @@ describe('orderReducer', () => {
     ];
 
     it('Request', () => {
-      const store = configureStore(orderSlice);
-      global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-      store.dispatch(getUserOrders());
-      const testState = store.getState();
+      const testState = orderSlice.reducer(
+        initialState,
+        getUserOrders.pending('')
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -146,20 +146,10 @@ describe('orderReducer', () => {
     });
 
     it('Success', async () => {
-      const store = configureStore(orderSlice);
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              success: true,
-              orders: ordersMock
-            })
-        })
-      ) as jest.Mock;
-
-      await store.dispatch(getUserOrders());
-      const testState = store.getState();
+      const testState = orderSlice.reducer(
+        initialState,
+        getUserOrders.fulfilled(ordersMock, '', undefined)
+      );
 
       expect(testState).toEqual({
         ...initialState,
@@ -170,15 +160,11 @@ describe('orderReducer', () => {
     });
 
     it('Failed', async () => {
-      const store = configureStore(orderSlice);
-      global.fetch = jest.fn(() =>
-        Promise.reject(new Error(errorMessage))
-      ) as jest.Mock;
-
       const errorMessage = 'Ошибка при загрузке списка заказов';
-
-      await store.dispatch(getUserOrders());
-      const testState = store.getState();
+      const testState = orderSlice.reducer(
+        initialState,
+        getUserOrders.rejected(new Error(errorMessage), '')
+      );
 
       expect(testState).toEqual({
         ...initialState,

@@ -4,7 +4,8 @@ import {
   getIngredients
 } from './ingredientsSlice';
 import { itemsMock } from '../../../utils/constants';
-import { configureStore } from '@reduxjs/toolkit';
+
+jest.mock('@api');
 
 describe('ingredientsReducer', () => {
   beforeEach(() => {
@@ -12,10 +13,10 @@ describe('ingredientsReducer', () => {
   });
 
   it('getIngredients->Request', () => {
-    const store = configureStore(ingredientsSlice);
-    global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
-    store.dispatch(getIngredients());
-    const testState = store.getState();
+    const testState = ingredientsSlice.reducer(
+      initialState,
+      getIngredients.pending('', undefined)
+    );
 
     expect(testState).toEqual({
       ...initialState,
@@ -26,20 +27,10 @@ describe('ingredientsReducer', () => {
   });
 
   it('getIngredients->Success', async () => {
-    const store = configureStore(ingredientsSlice);
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            success: true,
-            data: itemsMock
-          })
-      })
-    ) as jest.Mock;
-
-    await store.dispatch(getIngredients());
-    const testState = store.getState();
+    const testState = ingredientsSlice.reducer(
+      initialState,
+      getIngredients.fulfilled(itemsMock, '', undefined)
+    );
 
     expect(testState).toEqual({
       ingredients: itemsMock,
@@ -49,15 +40,11 @@ describe('ingredientsReducer', () => {
   });
 
   it('getIngredients->Failed', async () => {
-    const store = configureStore(ingredientsSlice);
-    global.fetch = jest.fn(() =>
-      Promise.reject(new Error(errorMessage))
-    ) as jest.Mock;
-
     const errorMessage = 'Ошибка при загрузке списка ингредиентов';
-
-    await store.dispatch(getIngredients());
-    const testState = store.getState();
+    const testState = ingredientsSlice.reducer(
+      initialState,
+      getIngredients.rejected(new Error(errorMessage), '', undefined)
+    );
 
     expect(testState).toEqual({
       ...initialState,

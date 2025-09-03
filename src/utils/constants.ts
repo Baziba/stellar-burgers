@@ -1,4 +1,5 @@
-import { TIngredient } from '@utils-types';
+import { TIngredient, TUser } from '@utils-types';
+import { TLoginData, TRegisterData } from '@api';
 
 export const itemsMock: TIngredient[] = [
   {
@@ -41,3 +42,19 @@ export const itemsMock: TIngredient[] = [
     image_large: 'https://code.s3.yandex.net/react/code/core-large.png'
   }
 ];
+
+export const userDataMock: TUser = {
+  name: 'Test 01 001',
+  email: 'tester01@test.test'
+};
+
+export const userLoginDataMock: TLoginData = {
+  email: 'tester01@test.test',
+  password: 'test333'
+};
+
+export const userRegistrationDataMock: TRegisterData = {
+  email: 'tester01@test.test',
+  password: '123123',
+  name: 'Test 01 001'
+};
